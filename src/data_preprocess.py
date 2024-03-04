@@ -52,7 +52,7 @@ class CharacterImage:
         return len(self.image_filenames)
 
 
-def load_train_test_data(data_dir):
+def create_train_test_data(data_dir):
     """ Create training and test datasets from the images read.
 
     Args:
@@ -70,9 +70,9 @@ def load_train_test_data(data_dir):
         all_images, test_size=0.1, random_state=42)
 
     # Create separate datasets for training and test
-    train_dataset = [dataset[idx] for idx in range(
+    train_dataset = [print("Image to train: ", idx) or dataset[idx] for idx in range(
         len(dataset)) if dataset.image_filenames[idx] in train_images]
-    test_dataset = [dataset[idx] for idx in range(
+    test_dataset = [print("Image to test: ", idx) or dataset[idx] for idx in range(
         len(dataset)) if dataset.image_filenames[idx] in test_images]
     return train_dataset, test_dataset
 
@@ -120,8 +120,9 @@ def preprocess_data(X_train_orig, Y_train_orig, X_test_orig, Y_test_orig):
     X_train = X_train_orig/255.
     X_test = X_test_orig/255.
 
-    encoder = OneHotEncoder(sparse=False)
-    Y_train = encoder.fit_transform(Y_train_orig)
-    Y_test = encoder.transform(Y_test_orig)
+    encoder = OneHotEncoder()
+    Y_train = encoder.fit_transform(Y_train_orig).toarray()
+    Y_test = encoder.transform(Y_test_orig).toarray()
+
 
     return X_train, Y_train, X_test, Y_test

@@ -39,7 +39,7 @@ class HahuNet:
         ])
 
         self.model.compile(
-            loss=tf.compat.v1.losses.sparse_softmax_cross_entropy,
+            loss=tf.keras.losses.CategoricalCrossentropy(),
             metrics=['accuracy'])
 
     def train(self, X_train, Y_train, epochs, batch_size):

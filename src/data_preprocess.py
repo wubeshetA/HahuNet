@@ -6,6 +6,7 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
 
 
 class CharacterImage:
@@ -74,3 +75,53 @@ def load_train_test_data(data_dir):
     test_dataset = [dataset[idx] for idx in range(
         len(dataset)) if dataset.image_filenames[idx] in test_images]
     return train_dataset, test_dataset
+
+
+def split_train_test_data(train_dataset, test_dataset):
+    """ Split the train and test datasets into features and labels and 
+    convert them to numpy arrays.
+
+    Args:
+        train_dataset (list): The training dataset
+        test_dataset (list): The test dataset
+
+    Returns:
+        tuple: The training and test datasets as numpy arrays
+    """
+    # Convert train and test datasets to numpy arrays
+    X_train_orig, Y_train_orig = zip(*train_dataset)
+    X_test_orig, Y_test_orig = zip(*test_dataset)
+
+    # Convert to numpy arrays
+    X_train_orig = np.array(X_train_orig)\
+        .reshape(-1, X_train_orig[0].shape[0], X_train_orig[0].shape[1], 1)
+    X_test_orig = np.array(X_test_orig)\
+        .reshape(-1, X_test_orig[0].shape[0], X_test_orig[0].shape[1], 1)
+
+    Y_train_orig = np.array(Y_train_orig).reshape(-1, 1)
+    Y_test_orig = np.array(Y_test_orig).reshape(-1, 1)
+
+    return X_train_orig, Y_train_orig, X_test_orig, Y_test_orig
+
+
+def preprocess_data(X_train_orig, Y_train_orig, X_test_orig, Y_test_orig):
+    """ Preprocess the data by normalizing the features and one-hot encoding the labels.
+
+    Args:
+        X_train_orig (numpy.ndarray): The training dataset
+        Y_train_orig (numpy.narray): The training labels
+        X_test_orig (numpy.ndarray): The test dataset
+        Y_test_orig (numpy.ndarray): The test labels
+
+    Returns:
+        tuple: The preprocessed training and test datasets
+    """
+    # Normalize the images
+    X_train = X_train_orig/255.
+    X_test = X_test_orig/255.
+
+    encoder = OneHotEncoder(sparse=False)
+    Y_train = encoder.fit_transform(Y_train_orig)
+    Y_test = encoder.transform(Y_test_orig)
+
+    return X_train, Y_train, X_test, Y_test
